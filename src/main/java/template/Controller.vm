@@ -1,0 +1,145 @@
+package ${PACKAGE_NAME};
+
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletRequest;
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springside.modules.web.Servlets;
+
+#foreach( $type in $CLASS_IMPORT_TYPES)
+import $type;
+#end
+
+import core.mybatis.PageParameter;
+import core.spring.RequestMappingName;
+
+@Controller
+@RequestMapping(value = "/${PO_FIRST_LOWER_NAME}")
+public class ${CLASS_FIRST_UPPER_NAME} {
+	
+	@Autowired
+	private ${PO_FIRST_UPPER_NAME}Service ${PO_FIRST_LOWER_NAME}Service;
+	
+	/**
+	 * 分页查询
+	 * @param pageNumber
+	 * @param pageSize
+	 * @param sortType
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMappingName(value = "查询列表")
+	@RequestMapping(value = "list", method = RequestMethod.GET)
+	public String list(@RequestParam(value = "page", defaultValue = "1") int pageNumber,
+			@RequestParam(value = "page.size", defaultValue = PageParameter.DEFAULT_PAGE_SIZE+"") int pageSize, 
+			Model model, ServletRequest request) {
+		
+		Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
+		
+		PageParameter page = new PageParameter();
+		page.setCurrentPage(pageNumber);
+		page.setPageSize(pageSize);
+		searchParams.put("page", page);
+		
+		List<${PO_FIRST_UPPER_NAME}> ${PO_FIRST_LOWER_NAME}s = ${PO_FIRST_LOWER_NAME}Service.searchByPage(searchParams);
+		
+		model.addAttribute("${PO_FIRST_LOWER_NAME}s", ${PO_FIRST_LOWER_NAME}s);
+		model.addAttribute("page", (Page)page);
+		model.addAttribute("paginationSize", pageSize);
+		
+
+		// 将搜索条件编码成字符串，用于排序，分页的URL
+		model.addAttribute("searchParams", Servlets.encodeParameterStringWithPrefix(searchParams, "search_"));
+		return "${MODULE_NAME}/${PO_FIRST_LOWER_NAME}/${PO_FIRST_LOWER_NAME}List";
+	}
+	
+	/**
+	 * 跳转到增加页面
+	 * @return
+	 */
+	@RequestMappingName(value = "打开增加页面")
+	@RequestMapping(value = "toAddPage", method = RequestMethod.GET)
+	public String toAddPage() {
+		return "${MODULE_NAME}/${PO_FIRST_LOWER_NAME}/${PO_FIRST_LOWER_NAME}Add";
+	}
+	
+	/**
+	 * 执行保存操作
+	 * @param ${PO_FIRST_LOWER_NAME}
+	 * @param redirectAttributes
+	 * @return
+	 */
+	@RequestMappingName(value = "保存")
+	@RequestMapping(value = "save", method = RequestMethod.POST)
+	public String save(@Valid ${PO_FIRST_UPPER_NAME} ${PO_FIRST_LOWER_NAME}, RedirectAttributes redirectAttributes) {
+		${PO_FIRST_LOWER_NAME}Service.save(${PO_FIRST_LOWER_NAME});
+		return "redirect:/${PO_FIRST_LOWER_NAME}/list";
+	}
+	
+	/**
+	 * 跳转到修改页面
+	 * @param ${PK_NAME_FOR_ONEPK}
+	 * @param model
+	 * @return
+	 */
+	@RequestMappingName(value = "打开修改页面")
+	@RequestMapping(value = "toUpdatePage/{${PK_NAME_FOR_ONEPK}}", method = RequestMethod.GET)
+	public String toUpdatePage(@PathVariable("${PK_NAME_FOR_ONEPK}") String ${PO_PK_FIRST_LOWER_NAME}, Model model) {
+		model.addAttribute("${PO_FIRST_LOWER_NAME}", ${PO_FIRST_LOWER_NAME}Service.findById(${PO_PK_FIRST_LOWER_NAME}));
+		return "${MODULE_NAME}/${PO_FIRST_LOWER_NAME}/${PO_FIRST_LOWER_NAME}Update";
+	}
+	
+	/**
+	 * 执行修改操作
+	 * @param ${PO_FIRST_LOWER_NAME}
+	 * @param redirectAttributes
+	 * @return
+	 */
+	@RequestMappingName(value = "修改")
+	@RequestMapping(value = "update", method = RequestMethod.POST)
+	public String update(@Valid @ModelAttribute("${PO_FIRST_LOWER_NAME}") ${PO_FIRST_UPPER_NAME} ${PO_FIRST_LOWER_NAME}, RedirectAttributes redirectAttributes) {
+		${PO_FIRST_LOWER_NAME}Service.update(${PO_FIRST_LOWER_NAME});
+		redirectAttributes.addFlashAttribute("message", "更新成功");
+		return "redirect:/${PO_FIRST_LOWER_NAME}/list";
+	}
+	
+	/**
+	 * 跳转详细页面
+	 * @param ${PK_NAME_FOR_ONEPK}
+	 * @param model
+	 * @return
+	 */
+	@RequestMappingName(value = "打开详细页面")
+	@RequestMapping(value = "toDetailPage/{${PK_NAME_FOR_ONEPK}}", method = RequestMethod.GET)
+	public String toDetailPage(@PathVariable("${PK_NAME_FOR_ONEPK}") String ${PO_PK_FIRST_LOWER_NAME}, Model model) {
+		model.addAttribute("${PO_FIRST_LOWER_NAME}", ${PO_FIRST_LOWER_NAME}Service.findById(${PO_PK_FIRST_LOWER_NAME}));
+		return "${MODULE_NAME}/${PO_FIRST_LOWER_NAME}/${PO_FIRST_LOWER_NAME}Detail";
+	}
+	
+	/**
+	 * 执行删除操作
+	 * @param ${PK_NAME_FOR_ONEPK}
+	 * @param redirectAttributes
+	 * @return
+	 */
+	@RequestMappingName(value = "删除")
+	@RequestMapping(value = "delete/{${PK_NAME_FOR_ONEPK}}")
+	public String delete(@PathVariable("${PK_NAME_FOR_ONEPK}") String ${PO_PK_FIRST_LOWER_NAME}, RedirectAttributes redirectAttributes) {
+		${PO_FIRST_LOWER_NAME}Service.delete(${PO_PK_FIRST_LOWER_NAME});
+		redirectAttributes.addFlashAttribute("message", "删除成功");
+		return "redirect:/${PO_FIRST_LOWER_NAME}/list";
+	}
+}

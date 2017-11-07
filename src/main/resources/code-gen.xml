@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<codegen>
+	<datasource>
+		<url>jdbc:mysql://192.168.153.36:3306/pop_order_assembledflow?useUnicode=true&amp;characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull</url>
+		<dbname>pop_order_assembledflow</dbname>
+		<username>root</username>
+		<pwd>123</pwd>
+	</datasource>
+	<moduleGen>
+	   <genElement table = "pop_loc_code_sub_status_relation" package = "com.sunyard.mall.ennOrderDelive"/>
+	</moduleGen>
+</codegen>

@@ -1,0 +1,50 @@
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
+<!-- 引入标签库-->
+<%@ include file="/pages/inc/taglibs.jsp" %>
+<html>
+<head>
+<title>$viewInfo.showTitle</title>
+<%@ include file="/pages/inc/header.jsp" %>
+</head>
+#set($dot="$")
+<body>
+<%@ include file="/pages/inc/common.jsp" %>
+<div id="container" class="main" style="width:95%">
+	<div style="margin-top:5px">
+	<table class="table">
+		<caption class="ui-corner-top">$viewInfo.showTitle</caption>
+#set($c=0)#set($index=1)
+#foreach( $field in $viewInfo.getFields())#if( $c % 3 == 0)
+			<tr>
+				<td class="inputLabelTd">$viewInfo.getFieldDisplayName($field)</td>
+				<td class="inputTd" #if($index == $viewInfo.fieldsLength)colspan="5"#end>$viewInfo.getCoutValue($field)</td>
+#set( $c=$c+1)#elseif( $c % 3 == 1 )
+				<td class="inputLabelTd">$viewInfo.getFieldDisplayName($field)</td>
+				<td class="inputTd" #if($index == $viewInfo.fieldsLength)colspan="3"#end>$viewInfo.getCoutValue($field)</td>
+#set( $c=$c+1)#elseif( $c % 3 == 2 )
+				<td class="inputLabelTd">$viewInfo.getFieldDisplayName($field)</td>
+				<td class="inputTd">$viewInfo.getCoutValue($field)</td>
+			</tr>
+#set( $c=$c+1)#end#set($index=$index+1)#end
+#if( $c % 3 != 0 )
+			</tr>
+#end
+
+		<tfoot>
+			<tr>
+				<td colspan="6" class="footTd">
+					<button type="button" onclick="window.location = '<c:url value='/$viewInfo.getlowerFirstEntityName()'/>'">${viewInfo.getBackTitle()}</button>
+				</td>
+			</tr>
+		</tfoot>
+	</table>
+	</div>
+	<div class="dl10"></div>
+</div>
+<!-- 引入尾文件-->
+<%@ include file="/pages/inc/footer.jsp" %>
+</body>
+</html>
+<script type="text/javascript">
+<%@ include file="${viewInfo.getViewJsPath()}" %>
+</script>

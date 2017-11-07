@@ -1,0 +1,59 @@
+<%@ page language="java" pageEncoding="${viewInfo.pageEncoding}" contentType="text/html; charset=${viewInfo.pageEncoding}" %>
+<%@ include file="/pages/inc/taglibs.jsp" %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>${viewInfo.title}</title>
+<%@ include file="/pages/inc/header.jsp" %>
+</head>
+#set($dot="$")#set($cols = 2)#set($colon = "：")
+<body>
+<%@ include file="/pages/inc/common.jsp" %>
+<div id="container" class="main" style="width:100%">
+    <div class="barTitle">
+		<div class="content"><a href="#"></a> <span>${viewInfo.title}</span></div>
+	</div>
+    <hr class="barTitleHr"></hr>
+	<form id="$viewInfo.formId" action="<c:url value='/$viewInfo.getEntityName(true)/update'/>"  method="post">
+    <div class="ui-table ui-widget ui-corner-all" type="nomargin">
+#foreach($pkField in ${viewInfo.getHidePKFields()})
+		${viewInfo.buildHideFieldHtml($pkField)}
+#end		
+#if(${viewInfo.showType} == "tab")
+#parse("tab.vm")
+#elseif(${viewInfo.showType} == "group")
+#parse("group.vm")
+#else
+#parse("common.vm")
+#end
+		<table class="table" type="foottable">
+			<tfoot class="footTd">
+				<tr>
+					<td class="inputTd">
+						<button id="submit_button" type="button" onclick="this.form.submit();">${viewInfo.getSubmitTitle()}</button>&nbsp;&nbsp;
+            			<button id="reset_button" type="reset">${viewInfo.getResetTitle()}</button>&nbsp;&nbsp;
+            			<button id="back_button" type="button" onclick="window.location = '<c:url value="/${viewInfo.getEntityName(true)}"/>'">${viewInfo.getBackTitle()}</button>
+					</td>
+				</tr>
+			</tfoot>
+		</table>
+        </div>
+	</form>
+</div>
+<%@ include file="/pages/inc/footer.jsp" %>
+</body>
+</html>
+<script type="text/javascript">
+	$dot("#submit_button").button({icons: {primary:'ui-icon-disk'}});
+	$dot("#reset_button").button({ icons: {primary:'ui-icon-refresh'}});
+	$dot("#back_button").button({ icons: {primary:'ui-icon-arrowthick-1-w'}});
+#if(${viewInfo.showType} == "tab")
+	${dot}("#${viewInfo.getEntityName(true)}Tabs").tabs({});
+#end
+#foreach( $queryField in $viewInfo.getFields())
+#set($fieldJS = $viewInfo.getFieldTagScript($queryField))
+#if($fieldJS != "")
+${fieldJS}
+#end
+#end
+</script>

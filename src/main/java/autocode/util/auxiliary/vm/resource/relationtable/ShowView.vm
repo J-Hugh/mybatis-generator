@@ -1,0 +1,51 @@
+<%@ page language="java" pageEncoding="${viewInfo.pageEncoding}" contentType="text/html; charset=${viewInfo.pageEncoding}" %>
+<%@ include file="/pages/inc/taglibs.jsp" %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>${viewInfo.title}</title>
+<%@ include file="/pages/inc/header.jsp" %>
+</head>
+#set($dot="$")#set($cols = 2)#set($colon = "：")
+<body>
+<%@ include file="/pages/inc/common.jsp" %>
+<div id="container" class="main" style="width:100%">
+    <div class="barTitle">
+		<div class="content"><a href="#"></a> <span>${viewInfo.title}</span></div>
+	</div>
+    <hr class="barTitleHr"></hr>
+	<div class="ui-table ui-widget ui-corner-all" type="nomargin">
+		<table class="table" type="forview">
+#set($index=1)#set($colspan = $cols*2 - ($viewInfo.fieldsLength*2 % $cols*2) + 1)
+#if(($viewInfo.fieldsLength*2 % $cols*2) == 0)#set($colspan = 0)#end
+#foreach( $field in $viewInfo.getFields())
+#if( $index % $cols == 1)
+			<tr>
+#end
+				<td class="inputLabelTd">$viewInfo.getFieldDisplayName($field)${colon}</td>
+				<td class="inputTd"#if($index == $viewInfo.fieldsLength) colspan="${colspan}"#end>$viewInfo.getCoutValue($field)</td>
+
+#if( $index % $cols == 0 || $index == $viewInfo.fieldsLength)
+			</tr>
+#end
+#set( $index=$index+1)
+#end
+		</table>
+		<table class="table" type="foottable">
+			<tfoot class="footTd">
+				<tr>
+					<td class="inputTd">
+            			<button id="back_button" type="button" onclick="window.location = '<c:url value="/${viewInfo.getEntityName(true)}"/>'">${viewInfo.getBackTitle()}</button>
+					</td>
+				</tr>
+			</tfoot>
+		</table>
+	</div>
+</div>
+<!-- 引入尾文件-->
+<%@ include file="/pages/inc/footer.jsp" %>
+</body>
+</html>
+<script type="text/javascript">
+	$dot("#back_button").button({icons:{primary:'ui-icon-arrowthick-1-w'}});
+</script>

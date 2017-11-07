@@ -1,0 +1,8 @@
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
+#set($dot="$")#set($dot1="#")
+	$("${dot1}$viewInfo.formId").form();
+	$(".footTd").buttonset();
+		
+#foreach( $field in $viewInfo.getFields())
+$viewInfo.getFieldTagScript($field)
+#end

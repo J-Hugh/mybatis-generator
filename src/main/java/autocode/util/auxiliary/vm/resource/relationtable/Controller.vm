@@ -1,0 +1,146 @@
+package ${javaInfo.basePackageName}.${javaInfo.module}.controller;
+
+#set($entityClass = ${javaInfo.getEntityName(false)})
+#set($entityVar = ${javaInfo.getEntityName(true)})
+#set($serviceClass = ${javaInfo.getEntityName(false)} + "Service")
+#set($serviceVar = ${javaInfo.getEntityName(true)} + "Service")
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.chinasofti.ro.bizframework.core.data.validation.Validation;
+import com.chinasofti.ro.bizframework.core.mvc.Controller;
+import com.chinasofti.ro.bizframework.core.mvc.View;
+import com.chinasofti.ro.bizframework.core.orm.Page;
+import com.chinasofti.ro.bizframework.core.orm.PageUtil;
+import ${javaInfo.basePackageName}.${javaInfo.module}.model.*;
+import ${javaInfo.basePackageName}.${javaInfo.module}.service.${serviceClass};
+
+
+
+/**
+ * <p>controller</p>
+ * 
+ * @author BizFoundation
+ * @version 5.0
+ * @since 1.0
+ */
+public class ${entityClass}Controller extends Controller {
+
+	protected Logger logger = LoggerFactory.getLogger(getClass());
+	
+	/**
+	 * <p>open grid page</p>
+	 * 
+	 */
+	public void list(){
+		this.render(SUCCESS);
+	}
+	
+	/**
+	 * <p>list data by page with grid</p>
+	 * @param page
+	 * @param ${entityVar}
+	 */
+	public void list${entityClass}(${entityClass} ${entityVar},Page page) {
+		page = ${serviceVar}.findByPage(${entityVar}, page);
+		this.renderJSON(PageUtil.toJson4JqGrid(page, true));
+	}
+
+	/**
+	 * <p>forword to add form page</p>
+	 */
+	public void add(){
+		this.render(SUCCESS);
+	}
+#set($index = 1)
+#set($args1 = "")##方法申明时定义的参数列表
+#set($args2 = "")##方法调用时传递的参数列表
+#foreach($entity in ${javaInfo.getEditEntityArgs()})
+	#if($index > 1)#set($args1 = $args1 + ",") #set($args2 =  $args2 + ",") #end
+	#set($args1 = $args1 + ${javaInfo.getEntityName($entity,false)} + " " + ${javaInfo.getEntityName($entity,true)}) 
+	#set($args2 = $args2 + ${javaInfo.getEntityName($entity,true)})
+	#set($index = $index + 1)
+#end
+
+	/**
+	 * <p>save ${args2}</p>
+	 * 
+	 */
+	public void save(${args1}){
+		if (Validation.hasErrors()) {
+			View view = new View(FAILED);
+#foreach($model in ${javaInfo.getEditRefEntities()})
+#set($modelVar = ${javaInfo.getEntityName($model,true)})
+			view.bind("${modelVar}",${modelVar});
+#end
+			this.render(view);
+		}
+		${serviceVar}.save(${args2});
+		this.success("add.success");
+		this.redirect(SUCCESS);
+	}
+	
+	
+	/**
+	 * <p>forword to edit form page</p>
+	 * 
+	 * @param id 
+	 */
+	public void edit(${javaInfo.getPKFieldJavaType($javaInfo.entity)} id){
+		View view = new View(SUCCESS);
+
+#foreach($model in ${javaInfo.getEditEntityArgs()})
+#set($pkFieldName = ${javaInfo.getPKFieldName($model,false)})
+#set($modelClass = ${javaInfo.getEntityName($model,false)})
+#set($modelVar = ${javaInfo.getEntityName($model,true)})
+		${modelClass} ${modelVar} = new ${modelClass}();
+		${modelVar}.${javaInfo.getFieldSetMethod(${pkFieldName})}(id);
+		${modelVar} = (${modelClass})${serviceVar}.findModelFirst(${modelVar});
+		view.bind("${modelVar}",${modelVar});
+		
+#end
+		this.render(view);
+	}
+
+	/**
+	 * <p>update ${args2}</p>
+	 * 
+	 */
+	public void update(${args1}){
+		${serviceVar}.update(${args2});
+		this.success("update.success");
+		this.redirect(SUCCESS);
+	}
+	
+	/**
+	 * <p>forword to view form page</p>
+	 *
+	 * @param id
+	 */
+	 public void show(${javaInfo.getPKFieldJavaType($javaInfo.entity)} id){
+		View view = new View(SUCCESS);
+		${entityClass} ${entityVar} = new ${entityClass}();
+		${entityVar}.set${javaInfo.getPKFieldName(false)}(id);
+		${entityVar} = (${entityClass})${serviceVar}.findModelFirst(${entityVar});
+		view.bind("${entityVar}", ${entityVar});
+		this.render(view);
+	}
+	
+	/**
+	 * <p>batch delete by ids</p>
+	 * 
+	 * @param ids
+	 */
+	 public void delete(String ids){
+		${serviceVar}.detete(ids);
+		this.success("delete.success");
+		this.redirect(SUCCESS);
+	}
+	
+	${serviceClass} ${serviceVar};
+
+	public void set${serviceClass}(${serviceClass} ${serviceVar}) {
+		this.${serviceVar} = ${serviceVar};
+	}
+}

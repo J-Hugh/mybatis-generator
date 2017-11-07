@@ -1,0 +1,146 @@
+package ${PACKAGE_NAME};
+
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.chinasofti.ro.bizframework.core.orm.Page;
+import com.chinasofti.ro.bizframework.core.orm.GridPage;
+import com.chinasofti.ro.bizframework.core.orm.query.QueryFilterUtil;
+import com.chinasofti.ro.bizframework.core.mvc.Controller;
+import com.chinasofti.ro.bizframework.core.orm.entity.Model;
+#if(${PO_IS_COMPOSITE_PK})
+import com.chinasofti.ro.bizframework.core.data.bind.CompositeKeyUtil;
+#end
+import com.chinasofti.ro.bizframework.core.data.validation.Validation;
+#foreach( $type in $CLASS_IMPORT_TYPES)
+import $type;
+#end
+
+/**
+ * <p>controller</p>
+ * 
+ * @author BizFoundation
+ * @version 5.0
+ * @since 1.0
+ */
+public class ${CLASS_FIRST_UPPER_NAME} extends Controller {
+	protected Logger logger = LoggerFactory.getLogger(getClass());
+	
+	/**
+	 * <p>open grid page</p>
+	 * 
+	 */
+	public void list() {
+		this.render(SUCCESS);
+	}
+
+	/**
+	 * <p>list data by page with grid</p>
+	 * @param gridPage
+	 * @param ${PO_FIRST_LOWER_NAME}
+	 */
+	public void list${PO_FIRST_UPPER_NAME}(GridPage gridPage,${PO_FIRST_UPPER_NAME} ${PO_FIRST_LOWER_NAME}) {
+		List queryFilterList = QueryFilterUtil.getQueryFilterList(${PO_FIRST_LOWER_NAME}.getQueryFilters());
+		Page page = gridPage.buildPage(Controller.request());
+		page = ${PO_FIRST_LOWER_NAME}Service.findPageByQueryFilter(${PO_FIRST_UPPER_NAME}.class, page, queryFilterList);
+		this.renderJSON(gridPage.pageToJson(page));
+	}
+
+	/**
+	 * <p>forword ${PO_FIRST_LOWER_NAME} view form page</p>
+	 *
+	 * @param id
+	 */
+#if(${PO_IS_COMPOSITE_PK})
+	public void show(String id) throws Exception {
+		${PO_PK_FIRST_UPPER_NAME} ${PO_PK_FIRST_LOWER_NAME} = new ${PO_PK_FIRST_UPPER_NAME}();
+		CompositeKeyUtil.setCompositeKey(${PO_PK_FIRST_LOWER_NAME},id,Controller.request());
+		Model ${PO_FIRST_LOWER_NAME} = ${PO_FIRST_LOWER_NAME}Service.findById(${PO_PK_FIRST_LOWER_NAME});
+		this.render(SUCCESS, ${PO_FIRST_LOWER_NAME});
+	}
+#else
+	public void show(${PO_PK_SIMPLE_TYPE} id) {
+		Model ${PO_FIRST_LOWER_NAME} = ${PO_FIRST_LOWER_NAME}Service.findById(id);
+		this.render(SUCCESS, ${PO_FIRST_LOWER_NAME});
+	}
+#end
+	
+	/**
+	 * <p>forword ${PO_FIRST_LOWER_NAME} add form page</p>
+	 */
+	public void add() {
+		this.render(SUCCESS);
+	}
+
+	/**
+	 * <p>save ${PO_FIRST_LOWER_NAME}</p>
+	 * 
+	 * @param ${PO_FIRST_LOWER_NAME}
+	 */
+	 public void save(${PO_FIRST_UPPER_NAME} ${PO_FIRST_LOWER_NAME}) {
+		if (Validation.hasErrors()) {
+			this.render(FAILED,${PO_FIRST_LOWER_NAME});
+			return;
+		}
+		${PO_FIRST_LOWER_NAME}Service.save(${PO_FIRST_LOWER_NAME});
+		this.success("add.success");
+		redirect(SUCCESS);
+	}
+	
+	/**
+	 * <p>forword ${PO_FIRST_LOWER_NAME} edit form page</p>
+	 * 
+	 * @param id 
+	 */
+#if(${PO_IS_COMPOSITE_PK})
+	public void edit(String id) throws Exception{
+		${PO_PK_FIRST_UPPER_NAME} ${PO_PK_FIRST_LOWER_NAME} = new ${PO_PK_FIRST_UPPER_NAME}();
+		CompositeKeyUtil.setCompositeKey(${PO_PK_FIRST_LOWER_NAME},id,Controller.request());
+		Model ${PO_FIRST_LOWER_NAME} = ${PO_FIRST_LOWER_NAME}Service.findById(${PO_PK_FIRST_LOWER_NAME});
+		this.render(SUCCESS, ${PO_FIRST_LOWER_NAME});
+	}
+#else
+	public void edit(${PO_PK_SIMPLE_TYPE} id) {
+		Model ${PO_FIRST_LOWER_NAME} = ${PO_FIRST_LOWER_NAME}Service.findById(id);
+		this.render(SUCCESS, ${PO_FIRST_LOWER_NAME});
+	}
+#end
+
+	/**
+	 * <p>update ${PO_FIRST_LOWER_NAME}</p>
+	 * 
+	 * @param ${PO_FIRST_LOWER_NAME}
+	 */
+	public void update(${PO_FIRST_UPPER_NAME} ${PO_FIRST_LOWER_NAME}) {
+		${PO_FIRST_LOWER_NAME}Service.update(${PO_FIRST_LOWER_NAME});
+		this.success("update.success");
+		this.redirect(SUCCESS);
+	}
+
+	/**
+	 * <p>batch delete ${PO_FIRST_LOWER_NAME} by ids</p>
+	 * 
+	 * @param ids
+	 */
+	public void delete(String ids) {
+#if(${PO_IS_COMPOSITE_PK})
+		this.${PO_FIRST_LOWER_NAME}Service.batchDelete(CompositeKeyUtil.convertIds(ids));
+#else
+		this.${PO_FIRST_LOWER_NAME}Service.batchDelete(ids);
+#end
+		this.success("delete.success");
+		this.redirect(SUCCESS);
+	}
+	
+	//ADD EXT METHOD
+	
+    /**
+     * <p>注入 ${PO_FIRST_LOWER_NAME}Service</p>
+     */
+    private ${PO_FIRST_UPPER_NAME}Service ${PO_FIRST_LOWER_NAME}Service;
+	public void set${PO_FIRST_UPPER_NAME}Service(${PO_FIRST_UPPER_NAME}Service ${PO_FIRST_LOWER_NAME}Service) {
+		this.${PO_FIRST_LOWER_NAME}Service = ${PO_FIRST_LOWER_NAME}Service;
+	}
+}

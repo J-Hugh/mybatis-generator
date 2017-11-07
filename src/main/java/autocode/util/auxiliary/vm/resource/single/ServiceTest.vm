@@ -1,0 +1,64 @@
+package ${PACKAGE_NAME};
+
+import org.apache.commons.lang.StringUtils;
+
+import com.chinasofti.ro.bizframework.core.Globals;
+import com.chinasofti.ro.bizframework.core.orm.Configuration;
+import com.chinasofti.ro.bizframework.core.orm.dialect.DBDialect;
+import com.chinasofti.ro.bizframework.core.orm.mapping.Mapping;
+import com.chinasofti.ro.bizframework.core.test.service.BaseTest;
+
+#foreach( $type in $CLASS_IMPORT_TYPES)
+import $type;
+#end
+
+/**
+ * <p>service test</p>
+ * 
+ * @author BizFoundation
+ * @version 5.0
+ * @since 1.0
+ */
+public class ${CLASS_FIRST_UPPER_NAME} extends BaseTest {
+	
+	/**
+	 * 注入 IMPORT_CLASS_FIRST_UPPER_NAME
+	 */
+	private ${IMPORT_CLASS_FIRST_UPPER_NAME} ${IMPORT_CLASS_FIRST_LOWER_NAME};
+	public void set${IMPORT_CLASS_FIRST_UPPER_NAME}(${IMPORT_CLASS_FIRST_UPPER_NAME} ${IMPORT_CLASS_FIRST_LOWER_NAME}) {
+		this.${IMPORT_CLASS_FIRST_LOWER_NAME} = ${IMPORT_CLASS_FIRST_LOWER_NAME};
+	}
+	
+	/**
+	 * 初始化hbm xml file
+	 */
+	protected void onSetUp() throws Exception {
+		DBDialect dialect = DBDialect.getDialect(Globals.DATABASE_TYPE_H2);
+		String mappingDirectoryLocations = Configuration.getString(Globals.CONF_MAPPINGDIRECTORY);
+		if (StringUtils.isNotBlank(mappingDirectoryLocations)) {
+			if (mappingDirectoryLocations.indexOf(";")!=-1) {
+				String[] mappingDirectoryLocationArr = mappingDirectoryLocations.split(";");
+				for (int i = 0; i < mappingDirectoryLocationArr.length; i++) {
+					if (mappingDirectoryLocationArr[i].indexOf("classpath") < 0) {
+						mappingDirectoryLocationArr[i] = "classpath*:" + mappingDirectoryLocationArr[i];
+					}
+					Mapping.initMapping(dialect, mappingDirectoryLocationArr[i]);
+				}
+			} else {
+				if (mappingDirectoryLocations.indexOf("classpath") < 0) {
+					mappingDirectoryLocations = "classpath*:" + mappingDirectoryLocations;
+				}
+				Mapping.initMapping(dialect, mappingDirectoryLocations);
+			}
+		}
+	}
+	
+	/**
+	 * 测试保存的方法
+	 */
+	public void testSave() {
+		${PO_FIRST_UPPER_NAME} ${PO_FIRST_LOWER_NAME} = new ${PO_FIRST_UPPER_NAME}();
+		${IMPORT_CLASS_FIRST_LOWER_NAME}.save(${PO_FIRST_LOWER_NAME});
+	}
+	
+}

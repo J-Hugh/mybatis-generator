@@ -1,0 +1,73 @@
+package ${PACKAGE_NAME};
+
+import java.util.List;
+
+import com.chinasofti.ro.bizframework.core.orm.Page;
+import com.chinasofti.ro.bizframework.core.orm.entity.Model;
+import com.chinasofti.ro.bizframework.core.orm.IDAO;
+#foreach( $type in $CLASS_IMPORT_TYPES)
+import $type;
+#end
+
+/**
+ * <p>service impl</p>
+ * 
+ * @author BizFoundation
+ * @version 5.0
+ * @since 1.0
+ */
+public class ${CLASS_FIRST_UPPER_NAME} #if($CLASS_IMPLEMENTS_INTERFACES!="")implements ${CLASS_IMPLEMENTS_INTERFACES}#end {
+
+	private IDAO dao;
+	
+	public void setDao(IDAO dao) {
+		this.dao = dao;
+	}
+
+	/**
+	 * 根据id查询数据
+	 * 
+	 * @param id
+	 * @return Product
+	 */
+	public Model findById(${PO_PK_SIMPLE_TYPE} id) {
+		${PO_FIRST_UPPER_NAME} ${PO_FIRST_LOWER_NAME} = new ${PO_FIRST_UPPER_NAME}();
+		${PO_FIRST_LOWER_NAME}.set${PO_PK_FIRST_UPPER_NAME}(id);
+		return (Model) dao.createQuery(${PO_FIRST_LOWER_NAME}).first();
+	}
+	
+	/**
+	 * 
+	 */
+	public Page findPageByQueryFilter(Class classs, Page page,
+			List queryFilterList) {
+		return dao.createQuery(classs, queryFilterList).fetch(page);
+	}
+
+	/**
+	 * 批量删除数据
+	 * 
+	 * @param ids
+	 * @return int[] delete records
+	 */
+	public int[] batchDelete(String ids) {
+		${PO_FIRST_UPPER_NAME} ${PO_FIRST_LOWER_NAME} = new ${PO_FIRST_UPPER_NAME}();
+		return dao.batchDelete(${PO_FIRST_LOWER_NAME}, ids);
+	}
+
+	/**
+	 * 保存数据
+	 * @param Model
+	 */
+	public void save(Model model) {
+		dao.save(model);
+	}
+
+	/**
+	 * 更新数据
+	 * @param Model
+	 */
+	public void update(Model model) {
+		dao.update(model);
+	}
+}

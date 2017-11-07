@@ -1,0 +1,20 @@
+package $javaInfo.packageName;
+
+import com.chinasofti.ro.bizframework.core.mvc.Controller;
+
+/**
+ * <p>controller</p>
+ * 
+ * @author BizFoundation
+ * @version 5.0
+ * @since 1.0
+ */
+public class $javaInfo.className extends Controller {
+	/**
+	 * <p>显示列表</p>
+	 * 
+	 */
+	public void index() {
+		
+	}
+}

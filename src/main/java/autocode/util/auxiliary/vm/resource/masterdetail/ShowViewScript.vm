@@ -1,0 +1,20 @@
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
+#set($dot="$")#set($dot1="#")
+
+#foreach($detail in ${viewInfo.getRelationEntityViewInfos()})
+	function get${detail.getEntityName()}QueryFilters(){
+		var queryFilters = '';
+#foreach($pkField in ${viewInfo.getPKFields(null)} )#set($index = ${viewInfo.getPKFields(null).size()})
+		queryFilters += 'EQS_' + '$viewInfo.getRelationTgtFieldName(${pkField.getFieldName()},$detail)' + ':' + document.getElementById('${viewInfo.getFieldName($pkField)}').value#if($index >1) + ","#end; #set($index=$index-1)
+
+#end
+		return queryFilters;
+	}
+#end
+		
+#foreach($detail in ${viewInfo.getRelationEntityViewInfos()})	
+	#set($url = "<c:url value='/" + ${viewInfo.getlowerFirstEntityName()} + "/list" + ${detail.getEntityName()} + "'/>")
+	${detail.buildJqGrid($url)}
+#end
+	$(".submit").buttonset();
+		

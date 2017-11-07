@@ -1,0 +1,97 @@
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
+<!-- 引入标签库-->
+<%@ include file="/pages/inc/taglibs.jsp" %>
+<html>
+<head>
+<title>$viewInfo.listTitle</title>
+<%@ include file="/pages/inc/header.jsp" %>
+</head>
+#set($dot="$")
+<body>
+<%@ include file="/pages/inc/common.jsp" %>
+<div class="main" style="width:95%">
+	<div style="margin-top:5px">	
+		<form id="$viewInfo.formId" action="<c:url value='/$viewInfo.getlowerFirstEntityName()'/>" method="post" style="padding-bottom:10px">
+			<table id="searchTable"  class="table">
+				<caption class="ui-corner-top">${viewInfo.getSearchConditionTitle()}</caption>
+				<%-- add search condition--%>
+#set($c=0)#set($index=1)
+#foreach( $queryField in $viewInfo.getQueryFields())#if( $c % 2 == 0)
+				<tr>
+					<td class="inputLabelTd">$viewInfo.getQueryFieldDisplayName($queryField)</td>
+					<td class="inputTd"#if($index == $viewInfo.queryFieldsLength) colspan="3"#end>
+						$viewInfo.getFieldTagHtml($queryField)
+					</td>
+#if($index == $viewInfo.queryFieldsLength)
+				</tr>
+#end#else
+					<td class="inputLabelTd">$viewInfo.getQueryFieldDisplayName($queryField)</td>
+					<td class="inputTd">
+						$viewInfo.getFieldTagHtml($queryField)
+					</td>
+				</tr>
+#end#set( $c=$c + 1)#set( $index=$index + 1)
+#end
+			
+				<tfoot>
+					<tr>
+					    <td colspan="4" class="footTd">
+							<button type="button" onclick="query()">${viewInfo.getSearchTitle()}</button>&nbsp;&nbsp;
+							<button type="reset" onclick="window.location.href='<c:url value='/$viewInfo.getlowerFirstEntityName()'/>'">${viewInfo.getResetTitle()}</button>
+					    </td>
+					</tr>
+				</tfoot>                
+			</table>
+		</form>
+	 </div>
+	 <div>
+		<table  id="$viewInfo.getlowerFirstEntityName()Table" class="grid">
+			<caption class="ui-corner-top">$viewInfo.listTitle</caption>
+			<thead>
+				<tr>#set($colspan = $viewInfo.resultFieldsLength +1)
+					<th colspan="${colspan}" class="grid-btn">
+						<div class="toolbar" style="margin:2px;float:left" >
+#if($viewInfo.rowSelectType != 'none')
+							<button class="icon-search" onclick="view();">
+							    ${viewInfo.getViewTitle()}
+							</button>
+#end
+							<button class="icon-add" onclick="window.location.href='<c:url value='/$viewInfo.getlowerFirstEntityName()/add'/>'">
+							    ${viewInfo.getAddTitle()}
+							</button>
+#if($viewInfo.rowSelectType != 'none')
+							<button class="icon-edit" onclick="edit();">
+							    ${viewInfo.getEditTitle()}
+							</button>
+							<button class="icon-delete" onclick="batchDelete();">
+								${viewInfo.getDeleteTitle()}
+							</button>
+#end
+						</div>
+					</th>
+				</tr>
+				<tr>
+#set($index=0)
+#if($viewInfo.rowSelectType != 'none')
+					<th style="width:1%"><input id="checkHead" onclick="checkAll(this,'key')" type="$viewInfo.rowSelectType"/></th>
+#end#set($index=1)#set($width=100/($viewInfo.resultFieldsLength+1))
+#foreach( $resultField in $viewInfo.getResultFields())
+					<th style="width:${width}%">$viewInfo.getResultFieldDisplayName($resultField)</th>
+#set($index=$index+1)#end
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td colspan="$colspan" class="dataTables_empty"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+<!-- 引入尾文件-->
+<%@ include file="/pages/inc/footer.jsp" %>
+</body>
+</html>
+<script type="text/javascript">
+<%@ include file="${viewInfo.getViewJsPath()}" %>
+</script>

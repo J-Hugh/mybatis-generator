@@ -1,0 +1,10 @@
+# -- ${PO_FIRST_LOWER_NAME}-START
+
+# -- ${PO_FIRST_LOWER_NAME} form --
+#foreach( $fieldMap in $FIELDS )
+#foreach($key in ${fieldMap.keySet()}) 
+$key = ${fieldMap.get($key)}
+#end
+#end
+
+# -- ${PO_FIRST_LOWER_NAME}-END

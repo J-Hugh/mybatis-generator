@@ -1,0 +1,58 @@
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
+<!-- 引入标签库-->
+<%@ include file="/pages/inc/taglibs.jsp" %>
+<html>
+<head>
+<title>$viewInfo.showTitle</title>
+<%@ include file="/pages/inc/header.jsp" %>
+</head>
+#set($dot="$")
+<body>
+<%@ include file="/pages/inc/common.jsp" %>
+<div id="container" class="main" style="width: 95%;">
+	<div class="frameborder">
+		<div class="bgTitle bgTitlebody">$viewInfo.showTitle</div>
+		<%-- 工具栏 --%>
+		<div class="toolbarDiv">
+			<button type="button" class="iconBack" onclick="window.location = '<c:url value='/$viewInfo.getlowerFirstEntityName()'/>'">${viewInfo.getBackTitle()}</button>
+		</div>
+		<form id="$viewInfo.formId">
+#foreach($pkField in $viewInfo.getPKFields(null) )
+		<input type="hidden" id="$viewInfo.getFieldName($pkField)" name="$viewInfo.getFieldName($pkField)" type="text" value="$viewInfo.getCoutValue($pkField)"/>
+#end
+		</from>
+		<%-- 主表信息 --%>
+		<table  class="table">
+#set($c=0)#set($index=1)
+#foreach( $field in $viewInfo.getFields())#if( $c % 3 == 0)
+			<tr>
+				<td class="inputLabelTd">$viewInfo.getFieldDisplayName($field)</td>
+				<td class="inputTd"#if($index == $viewInfo.fieldsLength) colspan="5"#end>$viewInfo.getCoutValue($field)</td>
+#set( $c=$c+1)#elseif( $c % 3 == 1 )
+				<td class="inputLabelTd">$viewInfo.getFieldDisplayName($field)</td>
+				<td class="inputTd"#if($index == $viewInfo.fieldsLength) colspan="3"#end>$viewInfo.getCoutValue($field)</td>
+#set( $c=$c+1)#elseif( $c % 3 == 2 )
+				<td class="inputLabelTd">$viewInfo.getFieldDisplayName($field)</td>
+				<td class="inputTd">$viewInfo.getCoutValue($field)</td>
+			</tr>
+#set( $c=$c+1)#end#set($index=$index+1)#end
+#if( $c % 3 != 0 )
+			</tr>
+#end
+		</table>
+		<%-- 从表信息 --%>
+#foreach($detail in ${viewInfo.getRelationEntityViewInfos()})
+		<div>
+			<table id="${detail.getlowerFirstEntityName()}Table"></table>
+			<div id="${detail.getlowerFirstEntityName()}Page"></div>
+		</div>
+#end
+	</div>
+</div>
+<!-- 引入尾文件-->
+<%@ include file="/pages/inc/footer.jsp" %>
+</body>
+</html>
+<script  type="text/javascript"  charset="UTF-8">
+<%@ include file="${viewInfo.getViewJsPath()}" %>
+</script>

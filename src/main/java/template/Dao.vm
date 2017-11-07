@@ -1,0 +1,64 @@
+package ${PACKAGE_NAME};
+
+import java.util.List;
+import java.util.Map;
+
+#foreach( $type in $CLASS_IMPORT_TYPES)
+import $type;
+#end
+
+import com.sunyard.sys.MyBatisRepository;
+
+/**
+ * 通过@MapperScannerConfigurer扫描目录中的所有接口, 动态在Spring Context中生成实现.
+ * 方法名称必须与Mapper.xml中保持一致.
+ * 
+ */
+@MyBatisRepository
+public interface ${CLASS_FIRST_UPPER_NAME}Dao {
+	
+	/**
+	 * 按条件分页查询记录
+	 * @param searchParams 条件
+	 * @return
+	 */
+	List<${PO_FIRST_UPPER_NAME}> searchByPage(Map<String,Object> searchParams);
+	
+	/**
+	 * 按条件查询记录
+	 * @param searchParams 条件
+	 * @return
+	 */
+	List<${PO_FIRST_UPPER_NAME}> search(Map<String,Object> searchParams);
+	
+	/**
+	 * 获取所有记录
+	 * @return
+	 */
+	List<${PO_FIRST_UPPER_NAME}> findAll();
+	
+	/**
+	 * 通过 ${PO_PK_FIRST_LOWER_NAME} 获取一条记录
+	 * @param ${PO_PK_FIRST_LOWER_NAME} 主键
+	 * @return
+	 */
+	${PO_FIRST_UPPER_NAME} findById(String ${PO_PK_FIRST_LOWER_NAME});
+	
+	/**
+	 * 保存一条记录
+	 * @param ${PO_FIRST_LOWER_NAME}
+	 */
+	void save(${PO_FIRST_UPPER_NAME} ${PO_FIRST_LOWER_NAME});
+	
+	/**
+	 * 通过${PO_FIRST_LOWER_NAME}删除一条记录
+	 * @param ${PO_FIRST_LOWER_NAME}
+	 */
+	void delete(String ${PO_PK_FIRST_LOWER_NAME});
+	
+	/**
+	 * 修改记录
+	 * @param ${PO_FIRST_LOWER_NAME}
+	 */
+	void update(${PO_FIRST_UPPER_NAME} ${PO_FIRST_LOWER_NAME});
+}

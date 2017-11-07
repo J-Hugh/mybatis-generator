@@ -1,0 +1,63 @@
+package ${PACKAGE_NAME};
+
+#foreach( $type in $CLASS_IMPORT_TYPES)
+import $type;
+#end
+import java.io.Serializable;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
+import com.sunyard.sys.MyBatisDomain;
+
+@MyBatisDomain
+public class ${CLASS_FIRST_UPPER_NAME} {
+    
+## Fields    
+#set($count=0)#foreach( $fieldName in $PO_FIELD_NAMES )
+    /**
+      * $PO_FIELD_COMMENT.get($count)
+      **/
+	private $PO_FIELD_ROBASE_SIMPLE_TYPES.get($count) $fieldName;
+#set($count=$count+1)#end
+
+## QueryOnlyFields
+#set($count1=0)#foreach( $fieldName in $PO_QUERY_EXT_FIELD_NAMES )
+	private $PO_QUERY_EXT_FIELD_TYPES.get($count1) $fieldName; 
+#set($count1=$count1+1)#end
+
+## default constructor
+	public ${CLASS_FIRST_UPPER_NAME}() {
+		super();
+	}
+
+## Property accessors
+#set($index=0)#foreach( $fieldName in $PO_FIELD_NAMES )
+##if($PO_FIELD_NOTBLANKS.get($index))
+##	@NotBlank
+###end
+#if($PO_FIELD_ROBASE_SIMPLE_TYPES.get($index) == "Date")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+08:00")
+#end
+	public $PO_FIELD_ROBASE_SIMPLE_TYPES.get($index) get$VmVarInfo.getJavaBeanFieldName($fieldName)() {
+		return this.$fieldName;
+	}
+
+	public void set$VmVarInfo.getJavaBeanFieldName($fieldName)($PO_FIELD_ROBASE_SIMPLE_TYPES.get($index) $PO_FIELD_NAMES.get($index)) {
+		this.$fieldName = $fieldName;
+	}
+#set($index=$index+1)#end
+
+	## QueryOnlyProperty accessors
+#set($index1=0)#foreach( $fieldName in $PO_QUERY_EXT_FIELD_NAMES )
+	public $PO_QUERY_EXT_FIELD_TYPES.get($index1) get$VmVarInfo.getJavaBeanFieldName($fieldName)() {
+		return this.$fieldName;
+	}
+
+	public void set$VmVarInfo.getJavaBeanFieldName($fieldName)($PO_QUERY_EXT_FIELD_TYPES.get($index1) $PO_QUERY_EXT_FIELD_NAMES.get($index1)) {
+		this.$fieldName = $fieldName;
+	}
+#set($index1=$index1+1)#end
+
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
+	}
+}

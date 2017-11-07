@@ -1,0 +1,144 @@
+package ${PACKAGE_NAME};
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import com.chinasofti.ro.bizframework.core.libs.StringUtil;
+import com.chinasofti.ro.bizframework.core.orm.JSonUtil;
+import com.chinasofti.ro.bizframework.core.orm.Page;
+import com.chinasofti.ro.bizframework.core.orm.entity.Model;
+import com.chinasofti.ro.bizframework.core.data.bind.CompositeKeyUtil;
+import com.chinasofti.ro.bizframework.core.orm.IDAO;
+#foreach( $type in $CLASS_IMPORT_TYPES)
+import $type;
+#end
+
+/**
+ * <p>service impl</p>
+ * 
+ * @author BizFoundation
+ * @version 5.0
+ * @since 1.0
+ */
+public class ${CLASS_FIRST_UPPER_NAME} #if($CLASS_IMPLEMENTS_INTERFACES!="")implements ${CLASS_IMPLEMENTS_INTERFACES}#end {
+	
+	private IDAO dao;
+	
+	public void setDao(IDAO dao){
+		this.dao = dao;
+	}
+	/**
+	 * <p>根据id查询数据</p>
+	 *
+	 * @param id
+	 * @return Order
+	 */
+	public Model findById(${PO_PK_SIMPLE_TYPE} id) {
+		${PO_FIRST_UPPER_NAME} ${PO_FIRST_LOWER_NAME} = new ${PO_FIRST_UPPER_NAME}();
+		${PO_FIRST_LOWER_NAME}.set${PO_PK_FIRST_UPPER_NAME}(id);
+		return (Model)dao.createQuery(${PO_FIRST_LOWER_NAME}).first();
+	}
+	
+	/**
+	 * <p>批量删除数据</p>
+	 *
+	 * @param ids
+	 * @return int[] delete records
+	 */
+	public int[] batchDelete(String ids) {
+		${PO_FIRST_UPPER_NAME} ${PO_FIRST_LOWER_NAME} = new ${PO_FIRST_UPPER_NAME}();
+#foreach($detail in $RELATION_ENTITY_INFO_LIST)
+		dao.batchDelete(${PO_FIRST_LOWER_NAME},new $detail.getPoFirstUpperName()(),ids);
+#end
+#if(${PO_IS_COMPOSITE_PK})
+		List pkList = CompositeKeyUtil.convertIds(${PO_PK_FIRST_UPPER_NAME}.class, ids);
+		return dao.batchDelete(${PO_FIRST_LOWER_NAME}, pkList);
+#else
+		return dao.batchDelete(${PO_FIRST_LOWER_NAME}, ids);
+#end
+	}
+
+	/**
+	 * 保存主从表数据
+	 * @param order
+#foreach($detail in $RELATION_ENTITY_INFO_LIST)
+	 * @param $detail.getPoFirstLowerName()
+#end
+	 */
+	 public void save(${PO_FIRST_UPPER_NAME} ${PO_FIRST_LOWER_NAME}#foreach($detail in $RELATION_ENTITY_INFO_LIST),String $detail.getPoFirstLowerName()#end) {
+		dao.save(${PO_FIRST_LOWER_NAME});
+#foreach($detail in $RELATION_ENTITY_INFO_LIST)
+		submitData(new $detail.getPoFirstUpperName()(), $detail.getPoFirstLowerName(),${PO_FIRST_LOWER_NAME});
+#end
+	 }
+
+	/**
+	 * 更新主从表数据
+	 * @param order
+#foreach($detail in $RELATION_ENTITY_INFO_LIST)
+	 * @param $detail.getPoFirstLowerName()
+#end
+	 */
+	 public void update(${PO_FIRST_UPPER_NAME} ${PO_FIRST_LOWER_NAME}#foreach($detail in $RELATION_ENTITY_INFO_LIST),String $detail.getPoFirstLowerName()#end) {
+		dao.update(${PO_FIRST_LOWER_NAME});
+#foreach($detail in $RELATION_ENTITY_INFO_LIST)
+		submitData(new $detail.getPoFirstUpperName()(), $detail.getPoFirstLowerName(),${PO_FIRST_LOWER_NAME});
+#end
+	 }	
+	
+	/**
+	 * 根据查询条件查询,返回翻页对象<code>Page</code>,<p>
+	 * 如果出错，会抛出RuntimeException：BizDAOException
+	 * @param classs 要查询对象的Class
+	 * @param page <code>Page</code>
+	 * @param queryFilterList 存放查询条件的List，List内是<code>QueryFilter</code>
+	 * @return page
+	 */
+	public Page findPageByQueryFilter(Class classs, Page page,
+			List queryFilterList) {
+		return dao.createQuery(classs, queryFilterList).fetch(page);
+	}
+	
+#foreach($detail in $RELATION_ENTITY_INFO_LIST)
+	/**
+	 * 提交从表数据
+	 * @param 
+	 * @param jsonStr 包含新增记录(addRows)、更新记录(updateRows)、删除记录ID列表(deleteRows)
+	 * @param 
+	 */
+	private void submitData(${detail.getPoFirstUpperName()} ${detail.getPoFirstLowerName()},String jsonStr,${PO_FIRST_UPPER_NAME} ${PO_FIRST_LOWER_NAME}){
+		List updateList = null;
+		List addList = null;
+		if(StringUtil.isNotBlank(jsonStr)){
+			Map map = JSonUtil.convertToMap(jsonStr);
+			if(map.containsKey("addRows")){
+				Object value = map.get("addRows");
+				addList = JSonUtil.paserJsonArray(${detail.getPoFirstLowerName()}.getClass(),value);
+				Iterator iterator = addList.iterator();
+				while (iterator.hasNext()) {
+					${detail.getPoFirstLowerName()} = (${detail.getPoFirstUpperName()}) iterator.next();
+					${detail.getLogic()}
+				}
+			}
+			if(map.containsKey("updateRows")){
+				Object value = map.get("updateRows");
+				updateList = JSonUtil.paserJsonArray(${detail.getPoFirstLowerName()}.getClass(), value);
+			}
+			if(map.containsKey("deleteRows")){
+				Object value = map.get("deleteRows");
+				String ids = JSonUtil.convertArrayToString(value, null);
+				if(StringUtil.isNotBlank(ids)){
+#if(${detail.isCompositeKey()})
+					List pkList = CompositeKeyUtil.convertIds(${detail.getPoPkFirstUpperName()}.class, ids);
+					dao.batchDelete(${detail.getPoFirstLowerName()}, pkList);
+#else
+					dao.batchDelete(${detail.getPoFirstLowerName()}, ids);
+#end			}
+			}
+		}
+		dao.batchSave(addList);
+		dao.batchUpdate(updateList);
+	}
+#end
+}

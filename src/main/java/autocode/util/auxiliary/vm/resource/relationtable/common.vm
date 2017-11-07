@@ -1,0 +1,18 @@
+		<table class="table">
+#set($index=1)#set($colspan = $cols*2 - ($viewInfo.fieldsLength*2 % $cols*2) + 1)
+#if(($viewInfo.fieldsLength*2 % $cols*2) == 0)#set($colspan = 0)#end
+#foreach( $field in $viewInfo.getFields())
+#if( $index % $cols == 1)
+			<tr>
+#end
+				<td class="inputLabelTd">$viewInfo.getFieldDisplayName($field)${colon}</td>
+				<td class="inputTd"#if($index == $viewInfo.fieldsLength) colspan="${colspan}"#end>
+					$viewInfo.getFieldTagHtml($field)
+				</td>
+
+#if( $index % $cols == 0 || $index == $viewInfo.fieldsLength)
+			</tr>
+#end
+#set( $index=$index+1)
+#end
+		</table>

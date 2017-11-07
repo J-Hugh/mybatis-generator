@@ -1,0 +1,34 @@
+package ${PACKAGE_NAME};
+
+import com.chinasofti.ro.bizframework.core.orm.IPrimaryKey;
+
+/**
+ * <p>model primary key</p>
+ * 
+ * @author BizFoundation
+ * @version 5.0
+ * @since 1.0
+ */
+public class ${PO_PK_FIRST_UPPER_NAME} implements IPrimaryKey {
+	// Fields    
+	#set($count=0)#foreach( $fieldName in $PO_PK_FIELD_NAMES )
+private $PO_PK_FIELD_ROBASE_SIMPLE_TYPES.get($count) $fieldName; 
+	#set($count=$count+1)#end
+	
+	//default constructor
+    public ${PO_PK_FIRST_UPPER_NAME}() {
+    	super();
+    }
+    
+    // Property accessors
+#set($index=0)#foreach( $fieldName in $PO_PK_FIELD_NAMES )
+    public $PO_PK_FIELD_ROBASE_SIMPLE_TYPES.get($index) get$PO_PK_FIELD_FIRST_UPPER_NAMES.get($index)() {
+        return this.$fieldName;
+    }
+    
+    public void set$PO_PK_FIELD_FIRST_UPPER_NAMES.get($index)($PO_PK_FIELD_ROBASE_SIMPLE_TYPES.get($index) $PO_PK_FIELD_NAMES.get($index)) {
+		this.$fieldName = $fieldName;
+    }
+    
+#set($index=$index+1)#end
+}

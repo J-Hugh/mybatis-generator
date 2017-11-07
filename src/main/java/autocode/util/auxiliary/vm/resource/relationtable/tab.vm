@@ -1,0 +1,35 @@
+#set($entityMap = ${viewInfo.getFieldsAsGroup()})
+#set($entityMapKeySet = ${entityMap.keySet()})
+		<div id = "${viewInfo.getEntityName(true)}Tabs">
+			<ul>
+#foreach($entity in $entityMapKeySet)
+				<li>
+					<a href="#${entity.getName()}Tab">${viewInfo.getEntityTitle($entity)}</a>
+				</li>
+#end
+			</ul>
+#foreach($entity in $entityMapKeySet)
+			<div id="${entity.getName()}Tab">
+				<table class="table">
+#set($tabFields = ${entityMap.get($entity)})
+#set($index=1)#set($colspan = $cols*2 - (${tabFields.size()}*2 % $cols*2) + 1)
+#if((${tabFields.size()}*2 % $cols*2) == 0)#set($colspan = 0)#end
+#foreach( $field in $tabFields)
+#if( $index % $cols == 1)
+			<tr>
+#end
+				<td class="inputLabelTd">$viewInfo.getFieldDisplayName($field)${colon}</td>
+				<td class="inputTd"#if($index == ${tabFields.size()}) colspan="${colspan}"#end>
+					$viewInfo.getFieldTagHtml($field)
+				</td>
+
+#if( $index % $cols == 0 || $index == ${tabFields.size()})
+			</tr>
+#end
+#set( $index=$index+1)
+#end					
+					
+				</table>			
+			</div>
+#end
+		</div>

@@ -1,0 +1,22 @@
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
+#set($dot="$")#set($dot1="#")
+	/**
+	 * add detail table data
+	*/ 
+	function addDitailData(form){
+#foreach($detail in ${viewInfo.getRelationEntityViewInfos()})	
+		${dot}("${dot1}${detail.getlowerFirstEntityName()}Table").jqGrid("saveEditCell");//保存处于编辑状态的Cell单元格
+		form.appendChild( createHidden("${detail.getlowerFirstEntityName()}", ${dot}("${dot1}${detail.getlowerFirstEntityName()}Table").jqGrid("getJsontosubmit")) );
+#end
+	}
+	
+	$("${dot1}$viewInfo.formId").form();
+	$(".submit").buttonset();
+		
+#foreach( $field in $viewInfo.getFields())
+$viewInfo.getFieldTagScript($field)
+#end
+
+#foreach($detail in ${viewInfo.getRelationEntityViewInfos()})	
+	${detail.buildJqGrid(null)}
+#end

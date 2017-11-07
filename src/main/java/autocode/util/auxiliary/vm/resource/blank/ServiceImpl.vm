@@ -1,0 +1,22 @@
+package $javaInfo.packageName;
+
+import com.chinasofti.ro.bizframework.core.orm.IDAO;
+#foreach( $type in $javaInfo.importTypes)
+import $type;
+#end
+
+/**
+ * <p>Service Impl</p>
+ * 
+ * @author BizFoundation
+ * @version 5.0
+ * @since 1.0
+ */
+public class $javaInfo.className implements $javaInfo.classImplementInterfaces {
+	private IDAO dao;
+	
+	public void setDao(IDAO dao) {
+		this.dao = dao;
+	}
+
+}

@@ -1,0 +1,27 @@
+<!--${PO_FIRST_LOWER_NAME}-CONTROLLER-START-->
+    <controller name="${PACKAGE_NAME}.${CLASS_FIRST_UPPER_NAME}">
+		<method name="list" uri="/${PO_FIRST_LOWER_NAME}">
+			<result name="success">${VIEW_LIST_URI}</result>
+		</method>
+		<method name="list${PO_FIRST_UPPER_NAME}" uri="/${PO_FIRST_LOWER_NAME}/list${PO_FIRST_UPPER_NAME}"/>
+		<method name="show" uri="/${PO_FIRST_LOWER_NAME}/show/{id}" >
+			<result name="success">${VIEW_SHOW_URI}</result>
+		</method>
+		<method name="add" uri="/${PO_FIRST_LOWER_NAME}/add" >
+			<result name="success">${VIEW_NEW_URI}</result>
+		</method>
+		<method name="save" uri="/${PO_FIRST_LOWER_NAME}/save">
+			<result name="success" type="redirect">@list</result>
+			<result name="failed">${VIEW_NEW_URI}</result>
+		</method>
+		<method name="edit" uri="/${PO_FIRST_LOWER_NAME}/edit/{id}" >
+			<result name="success">${VIEW_UPDATE_URI}</result>
+		</method>
+		<method name="update" uri="/${PO_FIRST_LOWER_NAME}/update" >
+			<result name="success" type="redirect">@list</result>
+		</method>
+		<method name="delete" uri="/${PO_FIRST_LOWER_NAME}/delete" >
+			<result name="success" type="redirect">@list</result>
+		</method>
+	</controller>
+    <!--${PO_FIRST_LOWER_NAME}-CONTROLLER-END-->

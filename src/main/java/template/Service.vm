@@ -1,0 +1,85 @@
+package ${PACKAGE_NAME};
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+#foreach( $type in $CLASS_IMPORT_TYPES)
+import $type;
+#end
+##import com.uni2uni.bsp.common.tools.CommonUtil;
+
+@Service
+public class ${CLASS_FIRST_UPPER_NAME}Service {
+
+	@Autowired
+	private ${DAO_FIRST_UPPER_NAME} ${DAO_FIRST_LOWER_NAME};
+	
+	/**
+	 * 按条件分页查询记录
+	 * @param searchParams 条件
+	 * @return
+	 */
+	public List<${PO_FIRST_UPPER_NAME}> searchByPage(Map<String,Object> searchParams) throws Exception {
+		return (List<${PO_FIRST_UPPER_NAME}>) ${DAO_FIRST_LOWER_NAME}.searchByPage(searchParams);
+	}
+
+	/**
+	 * 按条件查询记录
+	 * @param searchParams 条件
+	 * @return
+	 */
+	public List<${PO_FIRST_UPPER_NAME}> search(Map<String,Object> searchParams) throws Exception  {
+		return (List<${PO_FIRST_UPPER_NAME}>) ${DAO_FIRST_LOWER_NAME}.search(searchParams);
+	}
+
+	/**
+	 * 获取所有记录
+	 * @return
+	 */
+	public List<${PO_FIRST_UPPER_NAME}> findAll() throws Exception {
+		return (List<${PO_FIRST_UPPER_NAME}>) ${DAO_FIRST_LOWER_NAME}.findAll();
+	}
+	
+	/**
+	 * 通过${PK_NAME_FOR_ONEPK}获取一条记录
+	 * @param ${PK_NAME_FOR_ONEPK} 主键
+	 * @return
+	 */
+	public ${PO_FIRST_UPPER_NAME} findById(String ${PO_PK_FIRST_LOWER_NAME}) throws Exception {
+		${PO_FIRST_UPPER_NAME} ${PO_FIRST_LOWER_NAME} = ${DAO_FIRST_LOWER_NAME}.findById(${PO_PK_FIRST_LOWER_NAME});
+		if(${PO_FIRST_LOWER_NAME} == null){
+			${PO_FIRST_LOWER_NAME} = new ${PO_FIRST_UPPER_NAME}();
+		}
+		return ${PO_FIRST_LOWER_NAME};
+	}
+
+	/**
+	 * 保存一条记录
+	 * @param ${PO_FIRST_LOWER_NAME}
+	 */
+	public void save(${PO_FIRST_UPPER_NAME} ${PO_FIRST_LOWER_NAME}) throws Exception {
+		##${PO_FIRST_LOWER_NAME}.set${PO_PK_FIRST_UPPER_NAME}(CommonUtil.getId());
+		${DAO_FIRST_LOWER_NAME}.save(${PO_FIRST_LOWER_NAME});
+	}
+
+	/**
+	 * 通过 ${PK_NAME_FOR_ONEPK} 删除一条记录
+	 * @param ${PK_NAME_FOR_ONEPK} 主键
+	 */
+	public void delete(String ${PO_PK_FIRST_LOWER_NAME}) throws Exception {
+		${DAO_FIRST_LOWER_NAME}.delete(${PO_PK_FIRST_LOWER_NAME});
+
+	}
+	
+	/**
+	 * 修改记录
+	 * @param ${PO_FIRST_LOWER_NAME}
+	 */
+	public void update(${PO_FIRST_UPPER_NAME} ${PO_FIRST_LOWER_NAME}) throws Exception {
+		${DAO_FIRST_LOWER_NAME}.update(${PO_FIRST_LOWER_NAME});
+	}
+}

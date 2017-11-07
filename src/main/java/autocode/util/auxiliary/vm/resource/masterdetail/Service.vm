@@ -1,0 +1,106 @@
+package ${PACKAGE_NAME};
+
+import java.util.List;
+
+import com.chinasofti.ro.bizframework.core.orm.entity.Model;
+import com.chinasofti.ro.bizframework.core.orm.Page;
+#foreach( $type in $CLASS_IMPORT_TYPES)
+import $type;
+#end
+
+/**
+ *
+ * 业务逻辑接口类，在此定义实现业务逻辑需要的方法，使用时请注意：
+ *
+ * 1、平台默认提供声明式事物
+ *
+ * 平台为所有以Service结尾的类中的以save，update，insert，delete，batch，execute等单词为开头的方法提供了事务控制.
+ * 对有事物控制的方法平台会在需要的时候自动开启/关闭Connection.
+ * 声明式事物在applicationContext-core.xml中的dsTransactionInterceptor中定义：
+ * <property name="transactionAttributes">
+ * <props>
+ * <prop key="save*">PROPAGATION_REQUIRED</prop>
+ * <prop key="insert*">PROPAGATION_REQUIRED</prop>
+ * <prop key="create*">PROPAGATION_REQUIRED</prop>
+ * <prop key="update*">PROPAGATION_REQUIRED</prop>
+ * <prop key="delete*">PROPAGATION_REQUIRED</prop>
+ * <prop key="remove*">PROPAGATION_REQUIRED</prop>
+ * <prop key="batch*">PROPAGATION_REQUIRED</prop>
+ * <prop key="execute*">PROPAGATION_REQUIRED</prop>
+ * <prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+ * <prop key="find*">PROPAGATION_REQUIRED,readOnly</prop><!-- readOnly表示是查询，一般在查询的方法时使用-->
+ * <prop key="query*">PROPAGATION_REQUIRED,readOnly</prop>
+ * <prop key="search*">PROPAGATION_REQUIRED,readOnly</prop>
+ * </props>
+ * </property>
+ *
+ * 除了上述默认外还可以自定义。比如现有load开头的方法用来查询数据库，数据库开启关闭想交给平台管理，只需要按下面的注册即可：
+ * <prop key="load*">PROPAGATION_REQUIRED,readOnly</prop>
+ *
+ *
+ * 2、除了声明式事物，还可以使用com.chinasofti.ro.bizframework.core.orm.Transaction类来在您的方法中使用编程式事务，如：
+ * <pre>
+ * public void myMethod(String id) {
+ * Transaction.begin(); //开启事务
+ * try {
+ * ......
+ * Transaction.commit(); //提交
+ * } catch(Exception e) {
+ * Transaction.rollback(); //回滚
+ * }
+ * }
+ * </pre>
+ *
+ * 注意：在同一方法里，不要即使用声明式事务又使用编程式事务，
+ * 更多内容请参考《ResourceOne5.0BizFoundation常见问题解答》中的3.1.1和3.1.2
+ * 
+ * @author BizFoundation
+ * @version 5.0
+ * @since 1.0
+ */
+public interface ${CLASS_FIRST_UPPER_NAME} {
+ 	/**
+	 * 根据id查询数据
+	 *
+	 * @param id
+	 * @return List
+	 */
+	public Model findById(${PO_PK_SIMPLE_TYPE} id);
+	
+	/**
+	 * <p>批量删除数据</p>
+	 *
+	 * @param ids
+	 * @return int[] delete records
+	 */
+	public int[] batchDelete(String ids);
+
+	/**
+	 * 保存主从表数据
+	 * @param order
+#foreach($detail in $RELATION_ENTITY_INFO_LIST)
+	 * @param $detail.getPoFirstLowerName()
+#end
+	 */
+	public void save(${PO_FIRST_UPPER_NAME} ${PO_FIRST_LOWER_NAME}#foreach($detail in $RELATION_ENTITY_INFO_LIST),String $detail.getPoFirstLowerName()#end);
+
+	/**
+	 * 更新主从表数据
+	 * @param ${PO_FIRST_LOWER_NAME}
+#foreach($detail in $RELATION_ENTITY_INFO_LIST)
+	 * @param $detail.getPoFirstLowerName()
+#end
+	 */
+	public void update(${PO_FIRST_UPPER_NAME} ${PO_FIRST_LOWER_NAME}#foreach($detail in $RELATION_ENTITY_INFO_LIST),String $detail.getPoFirstLowerName()#end);
+
+	/**
+	 * 根据查询条件查询,返回翻页对象<code>Page</code>,<p>
+	 * 如果出错，会抛出RuntimeException：BizDAOException
+	 * @param classs 要查询对象的Class
+	 * @param page <code>Page</code>
+	 * @param queryFilterList 存放查询条件的List，List内是<code>QueryFilter</code>
+	 * @return page
+	 */
+	public Page findPageByQueryFilter(Class classs, Page page,
+			List queryFilterList);
+}

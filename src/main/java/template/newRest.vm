@@ -1,0 +1,171 @@
+package ${PACKAGE_NAME};
+
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springside.modules.beanvalidator.BeanValidators;
+import org.springside.modules.web.MediaTypes;
+import com.sunyard.sys.ResponseMsg;
+import java.util.Map;
+#foreach( $type in $CLASS_IMPORT_TYPES)
+import $type;
+#end
+/**
+ * rest服务
+ */
+@Controller
+@RequestMapping(value = "/api/${PO_FIRST_UPPER_NAME}")
+public class ${PO_FIRST_UPPER_NAME}Rest {
+
+	private static Logger logger = LoggerFactory.getLogger(${CLASS_FIRST_UPPER_NAME}Rest.class);
+
+	@Autowired
+	private ${SERVICE_FIRST_UPPER_NAME} ${SERVICE_FIRST_LOWER_NAME};
+
+	/**
+	 * 获取全部业务对象列表
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/list/v1", method = RequestMethod.GET, produces = MediaTypes.JSON_UTF_8)
+	public ResponseMsg<List<${PO_FIRST_UPPER_NAME}>> list() throws Exception{
+		List<${PO_FIRST_UPPER_NAME}> list = ${SERVICE_FIRST_LOWER_NAME}.findAll();
+		ResponseMsg<List<${PO_FIRST_UPPER_NAME}>> result=new ResponseMsg<List<${PO_FIRST_UPPER_NAME}>>();
+		result.setResponseBody(list);
+		result.setRetCode("200");
+		return result;
+	}
+	
+	/**
+	 * 取得单个业务对象
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/get/v1/{${PO_PK_FIRST_LOWER_NAME}}", method = RequestMethod.GET, produces = MediaTypes.JSON_UTF_8)
+	public ResponseMsg<${PO_FIRST_UPPER_NAME}>  get(@PathVariable("id") String id) throws Exception{
+		logger.info("-----------------------------------------------------------------------------------");
+		logger.info("rest服务==》get==》id："+id);
+		logger.info("-----------------------------------------------------------------------------------");
+		${PO_FIRST_UPPER_NAME} entity = ${SERVICE_FIRST_LOWER_NAME}.findById(id);
+	    ResponseMsg<${PO_FIRST_UPPER_NAME}> result=new ResponseMsg<${PO_FIRST_UPPER_NAME}>();
+		result.setResponseBody(entity);
+		result.setRetCode("200");
+		return result;
+	}
+	
+
+	/**
+	 * 插入一个业务对象
+	 * @param user
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/create/v1",method=RequestMethod.POST)
+	public ResponseMsg<Void> create(@RequestBody ${PO_FIRST_UPPER_NAME} user) throws Exception{
+		logger.info("-----------------------------------------------------------------------------------");
+		logger.info("rest服务==》create==》user："+user.toString());
+		logger.info("-----------------------------------------------------------------------------------");
+		${SERVICE_FIRST_LOWER_NAME}.save(user);
+		ResponseMsg<Void> result=new ResponseMsg<Void>();
+		result.setRetCode("200");
+		return result;
+	}
+	
+	
+
+	/**
+	 * 修改一个业务对象
+	 * @param user
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value="/update/v1",method=RequestMethod.POST)
+	public ResponseMsg<Void> update(@RequestBody ${PO_FIRST_UPPER_NAME} user) throws Exception{
+		logger.info("-----------------------------------------------------------------------------------");
+		logger.info("rest服务==》update==》user："+user.toString());
+		logger.info("-----------------------------------------------------------------------------------");
+		${SERVICE_FIRST_LOWER_NAME}.update(user);
+		ResponseMsg<Void> result=new ResponseMsg<Void>();
+		result.setRetCode("200");
+		return result;
+	}
+	
+	/**
+	 * 删除一个业务对象
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/delete/v1/{${PO_PK_FIRST_LOWER_NAME}}", method = RequestMethod.GET, produces = MediaTypes.JSON_UTF_8)
+	public ResponseMsg<Void> delete(@PathVariable("id") String id) throws Exception{
+		logger.info("-----------------------------------------------------------------------------------");
+		logger.info("rest服务==》delete==》id："+id);
+		logger.info("-----------------------------------------------------------------------------------");
+		${SERVICE_FIRST_LOWER_NAME}.delete(id);
+		ResponseMsg<Void> result=new ResponseMsg<Void>();
+		result.setRetCode("200");
+		return result;
+	}
+	
+	
+	/**
+	 * get方法传递多个参数
+	 * @param name
+	 * @param msg
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/hello/v1/{name}/{msg}", method = RequestMethod.GET, produces = MediaTypes.JSON_UTF_8)
+	public String hello(@PathVariable("name") String name,@PathVariable("msg") String msg) throws Exception{
+		logger.info("=========" + name + "," + msg);
+		return "test";
+	}
+	
+	/**
+	 * 按条件查询并分页
+	 * @param page
+	 * @return
+	 */
+	@RequestMapping(value = "/searchByPage/v1", method = RequestMethod.POST, produces = MediaTypes.JSON_UTF_8)
+	@ResponseBody
+	public ResponseMsg<List<${PO_FIRST_UPPER_NAME}>> searchByPage(Map<String,Object> map) throws Exception{
+		logger.info("-----------------------------------------------------------------------------------");
+		logger.info("rest服务==》searchByPage==》map："+map.toString());
+		logger.info("-----------------------------------------------------------------------------------");
+	
+		List<${PO_FIRST_UPPER_NAME}> list = ${SERVICE_FIRST_LOWER_NAME}.searchByPage(map);
+		ResponseMsg<List<${PO_FIRST_UPPER_NAME}>> result=new ResponseMsg<List<${PO_FIRST_UPPER_NAME}>>();
+		result.setResponseBody(list);
+		result.setRetCode("200");
+		return result;
+	}
+	/**
+	 * 按条件查询不分页
+	 * @param page
+	 * @return
+	 */
+	@RequestMapping(value = "/search/v1", method = RequestMethod.POST, produces = MediaTypes.JSON_UTF_8)
+	@ResponseBody
+	public ResponseMsg<List<${PO_FIRST_UPPER_NAME}>> search(Map<String,Object> map) throws Exception{
+		logger.info("-----------------------------------------------------------------------------------");
+		logger.info("rest服务==》search==》map："+map.toString());
+		logger.info("-----------------------------------------------------------------------------------");
+		List<${PO_FIRST_UPPER_NAME}> list = ${SERVICE_FIRST_LOWER_NAME}.searchByPage(map);
+		ResponseMsg<List<${PO_FIRST_UPPER_NAME}>> result=new ResponseMsg<List<${PO_FIRST_UPPER_NAME}>>();
+		result.setResponseBody(list);
+		result.setRetCode("200");
+		return result;
+	}
+
+
+}

@@ -1,0 +1,96 @@
+package ${javaInfo.getServiceImplPackageName()};
+
+import java.util.List;
+
+import com.chinasofti.ro.bizframework.core.orm.Page;
+import com.chinasofti.ro.bizframework.core.orm.entity.Model;
+import com.chinasofti.ro.bizframework.core.orm.entity.SqlModel;
+import com.chinasofti.ro.bizframework.core.orm.IDAO;
+import ${javaInfo.getPackageName()}.*;
+import ${javaInfo.getServicePackageName()}.*;
+/**
+ * <p>service impl</p>
+ * 
+ * @author BizFoundation
+ * @version 5.0
+ * @since 1.0
+ */
+public class ${javaInfo.getUpperServiceimpl()} implements ${javaInfo.getUpperServicename()}{
+
+	private IDAO dao;
+	
+	public void setDao(IDAO dao) {
+		this.dao = dao;
+	}
+	
+	/**
+	 * 分页查询
+	 * 
+	 * @param ${javaInfo.getClassName()}
+	 * @param page
+	 *            分页
+	 * @return
+	 */
+	public Page findByPage(${javaInfo.getClassFirstUpperName()} ${javaInfo.getClassName()}, Page page) {
+		return dao.createQuery(${javaInfo.getClassName()}).fetch(page);
+	}
+
+	/**
+	 * 根据model查询数据
+	 * 
+	 * @param model
+	 * @return Model
+	 */
+	public Model findModelFirst(Model model){
+		return (Model)dao.createQuery(model).first();
+	}
+	/**
+	 * 根据model查询数据
+	 * 
+	 * @param model
+	 * @return SqlModel
+	 */
+	public SqlModel findModelFirst(SqlModel model){
+		return (SqlModel)dao.createQuery(model).first();
+	}
+
+	/**
+	 * 保存关联实体信息
+	 * 
+#foreach($pentityname in ${javaInfo.getPentityNameList()})
+	* @param $pentityname
+#end
+	 */
+	public void save(#set($index=0)#foreach($pentityname in ${javaInfo.getPentityNameList()})#if($index==$javaInfo.getUpper_pentityNameList().size() - 1)$javaInfo.getUpper_pentityNameList().get($index) $pentityname#else$javaInfo.getUpper_pentityNameList().get($index) $pentityname,#end#set($index=$index+1)#end){
+		// 根据关联关系（即数据库外键）决定保存的先后顺序
+#set($index=0)#foreach($pentityname in ${javaInfo.getPentityNameList()})
+		dao.save($pentityname);
+		#if($index!=$javaInfo.getPentityNameList().size() - 1)$javaInfo.getOneway_one2oneList().get($index)#end
+#set($index=$index+1)#end
+	}
+	/**
+	 * 更新关联实体信息
+	 * 
+#foreach($pentityname in ${javaInfo.getPentityNameList()})
+	* @param $pentityname
+#end
+	 */
+	public void update(#set($index=0)#foreach($pentityname in ${javaInfo.getPentityNameList()})#if($index==$javaInfo.getUpper_pentityNameList().size() - 1)$javaInfo.getUpper_pentityNameList().get($index) $pentityname#else$javaInfo.getUpper_pentityNameList().get($index) $pentityname,#end#set($index=$index+1)#end){
+#foreach($pentityname in ${javaInfo.getPentityNameList()})
+		dao.update($pentityname);
+#end
+	}
+	/**
+	 * 批量删除关联实体信息
+	 * 
+	 * @param ids
+	 */
+	public void detete(String ids) {
+		System.out.println("ids: " + ids);
+#set($index= $javaInfo.getUpper_pentityNameList().size() - 1)#foreach($pentityname in ${javaInfo.getUpper_pentityNameList()})
+		dao.batchDelete(new $javaInfo.getUpper_pentityNameList().get($index)(), ids);
+#set($index=$index - 1)#end
+		
+	}
+
+}

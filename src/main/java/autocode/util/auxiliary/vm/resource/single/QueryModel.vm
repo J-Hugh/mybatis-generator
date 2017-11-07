@@ -1,0 +1,44 @@
+package ${PACKAGE_NAME};
+
+import com.chinasofti.ro.bizframework.core.orm.entity.SqlModel;
+
+#foreach( $type in $CLASS_IMPORT_TYPES)
+import $type;
+#end
+
+/**
+ * <p>query model</p>
+ * 
+ * @author BizFoundation
+ * @version 5.0
+ * @since 1.0
+ */
+public class ${CLASS_FIRST_UPPER_NAME} extends SqlModel {
+	// Fields    
+	#set($count=0)#foreach( $fieldName in $PO_FIELD_NAMES )
+private $PO_FIELD_ROBASE_SIMPLE_TYPES.get($count) $fieldName; 
+	#set($count=$count+1)#end
+	
+	//default constructor
+    public ${CLASS_FIRST_UPPER_NAME}() {
+    	super();
+    	
+#set($fieldcount=0)#foreach( $fieldName in $PO_FIELD_NAMES )
+        this.addField("$fieldName","$PO_FIELD_TABLE_NAMES.get($fieldcount)","$PO_FIELD_COLUMN_NAMES.get($fieldcount)");
+#set($fieldcount=$fieldcount+1)#end
+    }
+    
+    // Property accessors
+#set($index=0)#foreach( $fieldName in $PO_FIELD_NAMES )
+    public $PO_FIELD_ROBASE_SIMPLE_TYPES.get($index) get$PO_FIELD_FIRST_UPPER_NAMES.get($index)() {
+        return this.$fieldName;
+    }
+    
+    public void set$PO_FIELD_FIRST_UPPER_NAMES.get($index)($PO_FIELD_ROBASE_SIMPLE_TYPES.get($index) $PO_FIELD_NAMES.get($index)) {
+    	#if($fieldName != $PO_PK_FIRST_LOWER_NAME && $PO_FIELD_IS_PERSISTS.get($index) == true)this.firePropertyChange("$fieldName", this.$fieldName, $fieldName);
+    	#end
+this.$fieldName = $fieldName;
+    }
+    
+    #set($index=$index+1)#end
+}

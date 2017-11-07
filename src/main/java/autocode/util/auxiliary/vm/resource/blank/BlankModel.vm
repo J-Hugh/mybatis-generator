@@ -1,0 +1,14 @@
+package $javaInfo.packageName;
+
+import com.chinasofti.ro.bizframework.core.orm.entity.Model;
+
+/**
+ * <p>PModel</p>
+ * 
+ * @author BizFoundation
+ * @version 5.0
+ * @since 1.0
+ */
+public class $javaInfo.className extends Model {
+
+}

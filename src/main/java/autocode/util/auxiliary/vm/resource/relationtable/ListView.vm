@@ -1,0 +1,165 @@
+<%@ page language="java" pageEncoding="${viewInfo.pageEncoding}" contentType="text/html; charset=${viewInfo.pageEncoding}" %>
+<%@ include file="/pages/inc/taglibs.jsp" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>${viewInfo.title}</title>
+<%@ include file="/pages/inc/header.jsp" %>
+</head>
+#set($dot = "$")#set($cols = 3)#set($colon = "：")
+<body>
+<%@ include file="/pages/inc/common.jsp" %>
+<div class="main" style="width:100%">
+	<div class="barTitle">
+        <div class="content"><a href="#"></a> <span>${viewInfo.title}</span></div>
+	</div>
+	<hr class="barTitleHr"></hr>
+	<div class="ui-table ui-widget ui-corner-all" type="nomargin">
+		<form id="${viewInfo.formId}">
+		<table class="table" style="width:98%;">
+#set($index=1)#set($colspan = $cols*2 - ($viewInfo.queryFieldsLength*2 % $cols*2) + 1)
+#if(($viewInfo.queryFieldsLength*2 % $cols*2) == 0)#set($colspan = 0)#end
+#foreach( $$queryField in $viewInfo.getQueryFields())
+#if( $index % $cols == 1)
+			<tr>
+#end
+				<td class="inputLabelTd">$viewInfo.getQueryFieldDisplayName($queryField)${colon}</td>
+				<td class="inputTd"#if($index == $viewInfo.queryFieldsLength) colspan="${colspan}"#end>
+					$viewInfo.getFieldTagHtml($queryField)
+#if($index == $viewInfo.queryFieldsLength)
+    					<button id="query_button" type="button" onclick="query()">${viewInfo.getSearchTitle()}</button>&nbsp;&nbsp;
+    					<button id="reset_button" type="reset" onclick="window.location.href='${viewInfo.getEntityName(true)}'">${viewInfo.getResetTitle()}</button>
+#end
+				</td>
+
+#if( $index % $cols == 0 || $index == $viewInfo.queryFieldsLength)
+			</tr>
+#end
+#set( $index=$index+1)
+#end
+#set($btnColspan = $cols*2)
+#*			<tfoot class="footTd">
+				<tr>
+					<td colspan="${btnColspan}" class="inputTd">
+    					<button id="query_button" type="button" onclick="query()">${viewInfo.getSearchTitle()}</button>&nbsp;&nbsp;
+    					<button id="reset_button" type="reset" onclick="window.location.href='${viewInfo.getEntityName(true)}'">${viewInfo.getResetTitle()}</button>
+					</td>
+				</tr>
+			</tfoot>
+*#			
+		</table>
+
+		</form>
+    	 <div class="divspace_gray"></div> 
+    	 <div  class="ui-table ui-widget ui-corner-all">
+    		<table id="${viewInfo.getEntityName(true)}Table"></table>
+    		<div id="${viewInfo.getEntityName(true)}Pager"></div>
+    	 </div>
+	</div>
+</div>
+<%@ include file="/pages/inc/footer.jsp" %>
+</body>
+</html>
+<script type="text/javascript">
+	$dot("#query_button").button({ icons: {primary:'ui-icon-search'}});
+	$dot("#reset_button").button({ icons: {primary:'ui-icon-refresh'}});
+	var ${viewInfo.getEntityName(true)}Grid;
+    window.onload = function(){
+    	${viewInfo.getEntityName(true)}Grid = new biz.grid({
+    		id : "${viewInfo.getEntityName(true)}Table",
+    		url : "${viewInfo.getEntityName(true)}/list${viewInfo.getEntityName(false)}",
+    		multiselect : true,
+    		rownumbers : true,
+			width:"auto",
+    		navtype : "top",
+    		pager : "${viewInfo.getEntityName(true)}Pager",
+    		prmNames : {page:"pageNo",rows:"pageSize",sort:"orderFields",order:"order"},
+    		sortname : "${viewInfo.orderFields}",
+    		sortorder : "${viewInfo.orders}",
+    		colModel : [
+    			{name : "${viewInfo.getPkField().fieldName}", label:"${viewInfo.getPkField().displayName}",hidden : ${viewInfo.hidePkField()},key:true}, 
+#set($index = 1)
+#foreach($resutlField in ${viewInfo.getResultFields()})
+				{name : "$resutlField.fieldName"#if($index == 1),formatter:"showlink",formatoptions:{baseLinkUrl:"${viewInfo.getEntityName(true)}/show"}#end,label:"${viewInfo.getResultFieldDisplayName($resutlField)}"}#if($index < ${viewInfo.resultFieldsLength}),#end
+
+#set($index = $index + 1)
+#end
+    		],
+    		navopt:{addfunc:add,editfunc:edit,delfunc:batchDelete,viewfunc:view,refresh: false},
+    		serializeGridData:function(postData){//添加查询条件值
+    			var obj = {};
+#foreach( $queryField in $viewInfo.getQueryFields())
+				addAttrToObject(obj,"${queryField.fieldName}");
+#end
+    			${dot}.extend(true,obj,postData);//合并查询条件值与grid的默认传递参数
+    			return obj;
+    		}
+    	});
+    }
+	//将指定名称（name）的页面元素对应value添加到obj，name作为属性名称
+	function addAttrToObject(obj,name){
+		element = document.getElementById(name);
+		if(element == null || element.value == null || element.value == ""){
+			return ;
+		}
+		obj = obj || {}; 
+		obj[name] = element.value
+	}
+	
+	function query(){
+		${viewInfo.getEntityName(true)}Grid.trigger('reloadGrid');
+	}
+	
+	function add(){
+		window.location="${viewInfo.getEntityName(true)}/add";
+	}
+	
+	function edit(rowid){
+		rowid = ${viewInfo.getEntityName(true)}Grid.getGridParam("selarrrow");
+		if(rowid == null || rowid.length == 0){
+			showMessage("请选择要编辑的行。");
+			return ;
+		}else if(rowid.length > 1){
+			showMessage("只能编辑一行。");
+			return ;
+		}
+		var id = ${viewInfo.getEntityName(true)}Grid.getCell(rowid[0],"${viewInfo.getPkFieldName()}");
+		window.location="${viewInfo.getEntityName(true)}/edit/" + id;
+	}
+	
+	function view(rowid){
+		if(rowid == null){
+			showMessage('请选择要编辑的行');
+			return ;
+		}
+		var id = ${viewInfo.getEntityName(true)}Grid.getCell(rowid,"${viewInfo.getPkFieldName()}");
+		window.location="${viewInfo.getEntityName(true)}/show?id=" + id;
+	}
+	
+	function batchDelete(rowid){
+		var rowid = ${viewInfo.getEntityName(true)}Grid.getGridParam('selarrrow');
+		if(rowid == null || rowid.length == 0){
+			showMessage('请选择要删除的行');
+			return ;
+		}
+		if (!confirm(I18N.msg_del_confirm)) {
+			return;
+		}
+		var ids="";
+		for(var i=0; i < rowid.length;i++){
+			var id = ${viewInfo.getEntityName(true)}Grid.getCell(rowid[i],'${viewInfo.getPkFieldName()}');
+			if(i>0){
+				ids +=',';
+			}
+			ids += id;
+		}
+		window.location="${viewInfo.getEntityName(true)}/delete/" + ids;
+	}
+	
+#foreach( $queryField in $viewInfo.getQueryFields())
+#set($fieldJS = $viewInfo.getFieldTagScript($queryField))
+#if($fieldJS != "")
+${fieldJS}
+#end
+#end
+</script>

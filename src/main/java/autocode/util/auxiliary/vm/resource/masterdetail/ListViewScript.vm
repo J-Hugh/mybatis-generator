@@ -1,0 +1,117 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8"%>
+#set($dot="$")#set($dot1="#")
+	var oTable;
+	$(function() {
+	    using('grid', function () { //更多Grid使用方法请参考《页面组件示例中心》查询grid部分，或者《组件库参考手册》3.6.1章节
+			oTable = $('${dot1}$viewInfo.getlowerFirstEntityName()Table').grid( {
+				bProcessing: true, //是否显示加载数据时提示信息
+				bServerSide: true, //是否从服务器端获取数据源
+				aaSorting:[],      //设定每列排序方式
+				iDisplayLength: $viewInfo.pageSize,  //设定分页显示时默认单页显示数据量
+				sPaginationType:"full_numbers",      //设定分页工具条类型
+				bAutoWidth:false,                    //是否自动宽度
+				aLengthMenu: [10, 15, 20, 25, 50, 100],          //设定分页下拉框数据
+				aoColumnDefs: [       //列属性
+#set($index=0)#if($viewInfo.rowSelectType != 'none')
+					{ sName: "$viewInfo.pkName", //列名称
+					  sColumnDataType:"$viewInfo.rowSelectType", //列显示类型
+					  sClass: "keyclass",  //列样式类
+					  sColumnDataTypePro:{'name':'key'}, //列显示属性
+					  bSortable: false,  //此列是否可排序
+					  aTargets: [ ${index} ]}#if($viewInfo.resultFieldsLength>0),#end //列序号
+#set($index=1)#end#set($idx=$index)#foreach( $resultField in $viewInfo.getResultFields())
+#if($idx == 0 || ($idx == 1 && $viewInfo.rowSelectType != 'none'))
+					{ sName: "$viewInfo.getFieldName($resultField)",sColumnDataType:'link',
+						sColumnDataTypePro:{'url':"<c:url value='/$viewInfo.getlowerFirstEntityName()/show/{$viewInfo.pkName}'/>",name:'$viewInfo.getFieldName($resultField)'},aTargets: [ ${idx} ] }#if($idx+1 < $viewInfo.resultFieldsLength + $index),#end
+#else
+					{sName: "$viewInfo.getFieldName($resultField)" ,aTargets: [ ${idx} ]} #if($idx+1 < $viewInfo.resultFieldsLength + $index),#end #end
+
+#set($idx=$idx+1)#end              
+               ],
+				sAjaxSource: "<c:url value='/$viewInfo.getlowerFirstEntityName()/list${viewInfo.getEntityName()}'/>", //数据源
+				fnServerData: function ( sSource, aoData, fnCallback ) { //向服务端请求数据操作
+					queryFilters =  getQueryFilter();
+					aoData.push( { "name": "queryFilters", "value":queryFilters} );//增加自定义参数传递给server端
+					#if($viewInfo.orderFields)aoData.push( { "name": "orderFields", "value":"$viewInfo.orderFields"} );#end
+					
+					#if($viewInfo.orders)aoData.push( { "name": "orders", "value":"$viewInfo.orders"} );
+#end
+					${dot}.ajax({  //ajax请求server端数据
+						"dataType": 'json', 
+						"type": "POST",
+						"url": sSource,
+						"data": aoData,
+						"success": fnCallback
+					} );
+				}
+			} );
+		})
+	} );
+	/**
+	 * search by form
+	 *
+	 * @param form 
+	 */ 
+	function query() {
+		oTable.fnDraw();
+	};
+	
+	/**
+	 * get query filter string
+	 *
+	 */ 
+	function getQueryFilter() {
+		var searchStr = '';
+		var form = document.getElementById("$viewInfo.formId");
+	    for (var i = 0; i < form.elements.length; i++) {
+	        var element = form.elements[i];
+	        $viewInfo.queryConditionBuild
+	    }
+	    searchStr = searchStr.substr(0, searchStr.length - 1);
+	    return searchStr;
+	};
+
+	/**
+	 * batch delete
+	 */ 
+	function batchDelete() {
+		var checkValues = getCoulmnValue(oTable,'key');
+		if (isEmpty(checkValues)) {
+			showInfo(I18N.msg_no_sel_del_record);
+			return;
+		}
+		if (confirm(I18N.msg_del_confirm)) {
+			var formEl = document.getElementById("$viewInfo.formId");
+			formEl.appendChild( createHidden('ids',checkValues) );
+			formEl.action = "<c:url value='/$viewInfo.getlowerFirstEntityName()/delete'/>";
+			formEl.submit();
+		}
+	}
+	
+	
+	/**
+	 * edit
+	 */ 
+	function edit() {
+		var checkValues = getCoulmnValue(oTable,'key');
+		if ( isEdit(checkValues) ) {
+			window.location.href=contextPath + "/$viewInfo.getlowerFirstEntityName()/edit/" + checkValues;	
+		}
+	}
+	
+	/**
+	 * view
+	 */ 
+	function view() {
+		var checkValues = getCoulmnValue(oTable,'key');
+		if ( isView(checkValues) ) {
+			window.location.href=contextPath + "/$viewInfo.getlowerFirstEntityName()/show/" + checkValues;
+		}
+	}
+	
+	$("${dot1}$viewInfo.formId").form();
+	$(".footTd").buttonset();
+
+#foreach( $queryField in $viewInfo.getQueryFields())
+$viewInfo.getFieldTagScript($queryField)	
+#end
